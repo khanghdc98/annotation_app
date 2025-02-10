@@ -3,7 +3,7 @@ import json
 import shutil
 import pandas as pd
 import tkinter as tk
-from tkinter import filedialog, messagebox, Canvas, Frame, Scrollbar
+from tkinter import filedialog, messagebox, Canvas, Frame, Scrollbar, Entry, Label
 from PIL import Image, ImageTk
 
 # Global variables
@@ -14,6 +14,7 @@ output_dir = ""
 output_csv = "annotations.csv"
 label_data = []
 csv_columns = ["image_filename", "label"]
+annotated_images = set()  # Track already labeled images
 
 # Load labels from JSON file
 def load_labels():
@@ -24,14 +25,33 @@ def load_labels():
             label_data = json.load(f)
         refresh_label_buttons()
 
-# Load images from directory
+# Load images from directory (only those not in CSV)
 def load_images():
-    global image_list, image_dir, current_index
+    global image_list, image_dir, current_index, annotated_images
     image_dir = filedialog.askdirectory(title="Select Image Directory")
-    if image_dir:
-        image_list = [f for f in os.listdir(image_dir) if f.lower().endswith((".png", ".jpg", ".jpeg"))]
-        current_index = 0
-        show_image()
+    
+    if not image_dir:
+        return
+
+    # Read the existing CSV file and track labeled images
+    annotated_images = set()
+    if os.path.exists(output_csv):
+        try:
+            df = pd.read_csv(output_csv)
+            annotated_images = set(df["image_filename"].tolist())
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not read CSV file: {e}")
+
+    # Filter out already annotated images
+    all_images = [f for f in os.listdir(image_dir) if f.lower().endswith((".png", ".jpg", ".jpeg"))]
+    image_list = [img for img in all_images if img not in annotated_images]
+
+    if not image_list:
+        messagebox.showinfo("Info", "No new images to label.")
+        return
+
+    current_index = 0
+    show_image()
 
 # Select output directory
 def select_output_folder():
@@ -101,9 +121,12 @@ def refresh_label_buttons():
     # Create buttons dynamically
     row, col = 0, 0
     for label in label_data:
-        btn = tk.Button(label_inner_frame, text=label, font=("Arial", 10), width=10, height=1,
-                        command=lambda l=label: save_annotation(l), bg="lightgray")
-        btn.grid(row=row, column=col, padx=5, pady=5)
+        btn = tk.Button(
+            label_inner_frame, text=label, font=("Arial", 10), 
+            command=lambda l=label: save_annotation(l), 
+            bg="lightgray", wraplength=100, anchor="center"  # Auto-fit content
+        )
+        btn.grid(row=row, column=col, padx=5, pady=5, sticky="w")
 
         col += 1
         if col >= 10:  # Limit to 10 buttons per row
@@ -113,6 +136,18 @@ def refresh_label_buttons():
     # Update scroll region
     label_canvas.update_idletasks()
     label_canvas.config(scrollregion=label_canvas.bbox("all"))
+
+# Set custom CSV filename
+def set_csv_filename():
+    global output_csv
+    filename = csv_entry.get().strip()
+    if filename:
+        if not filename.endswith(".csv"):
+            filename += ".csv"
+        output_csv = filename
+        messagebox.showinfo("Success", f"Output CSV set to: {output_csv}")
+    else:
+        messagebox.showwarning("Warning", "Invalid CSV filename!")
 
 # Tkinter GUI Setup
 root = tk.Tk()
@@ -128,6 +163,15 @@ tk.Button(top_frame, text="Load Images", font=("Arial", 12), command=load_images
 tk.Button(top_frame, text="Set Output Folder", font=("Arial", 12), command=select_output_folder).pack(side="left", padx=10)
 tk.Button(top_frame, text="Exit", font=("Arial", 12), command=root.quit, fg="white", bg="red").pack(side="right", padx=10)
 
+# CSV Filename Entry
+csv_frame = tk.Frame(root)
+csv_frame.pack(fill="x", padx=10, pady=5)
+
+Label(csv_frame, text="Output CSV:", font=("Arial", 12)).pack(side="left", padx=5)
+csv_entry = Entry(csv_frame, font=("Arial", 12), width=30)
+csv_entry.pack(side="left", padx=5)
+tk.Button(csv_frame, text="Set", font=("Arial", 12), command=set_csv_filename).pack(side="left", padx=5)
+
 # Image Display Area
 img_frame = tk.Frame(root, bd=2, relief="solid")
 img_frame.pack(fill="both", expand=True, padx=20, pady=10)
@@ -142,7 +186,7 @@ filename_label.pack(pady=5)
 label_container = tk.Frame(root)
 label_container.pack(fill="x", padx=10, pady=5)
 
-label_canvas = Canvas(label_container, height=150)
+label_canvas = Canvas(label_container, height=300)
 label_scrollbar = Scrollbar(label_container, orient="vertical", command=label_canvas.yview)
 
 label_inner_frame = Frame(label_canvas)  # Ensure this is created once
