@@ -69,8 +69,8 @@ def show_image():
     image_path = os.path.join(image_dir, image_list[current_index])
     image = Image.open(image_path)
 
-    # Restrict image height (e.g., max 500 pixels)
-    max_height = 500
+    # Restrict image height (e.g., max 400 pixels)
+    max_height = 400
     img_width, img_height = image.size
     scale_factor = max_height / img_height
     new_size = (int(img_width * scale_factor), max_height) if img_height > max_height else (img_width, img_height)
@@ -111,6 +111,10 @@ def save_annotation(label):
     else:
         messagebox.showinfo("Done", "All images labeled!")
         root.quit()
+
+# Enable mouse scroll for label selection area
+def on_mouse_scroll(event):
+    label_canvas.yview_scroll(-1 * (event.delta // 120), "units")
 
 # Create a scrollable label selection area
 def refresh_label_buttons():
@@ -172,8 +176,8 @@ csv_entry = Entry(csv_frame, font=("Arial", 12), width=30)
 csv_entry.pack(side="left", padx=5)
 tk.Button(csv_frame, text="Set", font=("Arial", 12), command=set_csv_filename).pack(side="left", padx=5)
 
-# Image Display Area
-img_frame = tk.Frame(root, bd=2, relief="solid")
+# Image Display Area (Smaller Height)
+img_frame = tk.Frame(root, bd=2, relief="solid", height=300)
 img_frame.pack(fill="both", expand=True, padx=20, pady=10)
 
 img_label = tk.Label(img_frame, bg="black")  # Black background for contrast
@@ -189,7 +193,7 @@ label_container.pack(fill="x", padx=10, pady=5)
 label_canvas = Canvas(label_container, height=300)
 label_scrollbar = Scrollbar(label_container, orient="vertical", command=label_canvas.yview)
 
-label_inner_frame = Frame(label_canvas)  # Ensure this is created once
+label_inner_frame = Frame(label_canvas)
 
 label_inner_frame.bind("<Configure>", lambda e: label_canvas.config(scrollregion=label_canvas.bbox("all")))
 label_canvas.create_window((0, 0), window=label_inner_frame, anchor="nw")
@@ -197,6 +201,9 @@ label_canvas.create_window((0, 0), window=label_inner_frame, anchor="nw")
 label_canvas.config(yscrollcommand=label_scrollbar.set)
 label_canvas.pack(side="left", fill="x", expand=True)
 label_scrollbar.pack(side="right", fill="y")
+
+# Enable mouse wheel scrolling
+label_canvas.bind_all("<MouseWheel>", on_mouse_scroll)
 
 # Run Tkinter App
 root.mainloop()
