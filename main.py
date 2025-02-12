@@ -15,6 +15,7 @@ output_csv = "annotations.csv"
 label_data = []
 csv_columns = ["image_filename", "label"]
 annotated_images = set()  # Track already labeled images
+total_images = 0  # Total images in directory
 
 # Load labels from JSON file
 def load_labels():
@@ -22,12 +23,12 @@ def load_labels():
     json_file = filedialog.askopenfilename(title="Select Labels JSON", filetypes=[("JSON Files", "*.json")])
     if json_file:
         with open(json_file, "r") as f:
-            label_data = json.load(f)
+            label_data = sorted(json.load(f))  # Sort labels alphabetically
         refresh_label_buttons()
 
 # Load images from directory (only those not in CSV)
 def load_images():
-    global image_list, image_dir, current_index, annotated_images
+    global image_list, image_dir, current_index, annotated_images, total_images
     image_dir = filedialog.askdirectory(title="Select Image Directory")
     
     if not image_dir:
@@ -42,8 +43,9 @@ def load_images():
         except Exception as e:
             messagebox.showerror("Error", f"Could not read CSV file: {e}")
 
-    # Filter out already annotated images
+    # Get all images and filter out already annotated ones
     all_images = [f for f in os.listdir(image_dir) if f.lower().endswith((".png", ".jpg", ".jpeg"))]
+    total_images = len(all_images)
     image_list = [img for img in all_images if img not in annotated_images]
 
     if not image_list:
@@ -51,6 +53,7 @@ def load_images():
         return
 
     current_index = 0
+    update_progress_label()  # Update progress count
     show_image()
 
 # Select output directory
@@ -81,6 +84,10 @@ def show_image():
     img_label.image = img
     filename_label.config(text=f"Image: {image_list[current_index]}")
 
+# Update progress label
+def update_progress_label():
+    progress_label.config(text=f"Progress: {len(annotated_images)}/{total_images}")
+
 # Save annotation (copy image instead of moving)
 def save_annotation(label):
     global current_index
@@ -104,6 +111,10 @@ def save_annotation(label):
     else:
         df.to_csv(output_csv, mode="a", header=False, index=False)
 
+    # Add image to annotated set and update progress
+    annotated_images.add(image_name)
+    update_progress_label()
+
     # Move to next image
     current_index += 1
     if current_index < len(image_list):
@@ -122,9 +133,12 @@ def refresh_label_buttons():
     for widget in label_inner_frame.winfo_children():
         widget.destroy()
     
+    # Sort labels alphabetically before displaying
+    sorted_labels = sorted(label_data)
+
     # Create buttons dynamically
     row, col = 0, 0
-    for label in label_data:
+    for label in sorted_labels:
         btn = tk.Button(
             label_inner_frame, text=label, font=("Arial", 10), 
             command=lambda l=label: save_annotation(l), 
@@ -133,7 +147,7 @@ def refresh_label_buttons():
         btn.grid(row=row, column=col, padx=5, pady=5, sticky="w")
 
         col += 1
-        if col >= 10:  # Limit to 10 buttons per row
+        if col >= 11:  # Limit to 11 buttons per row
             col = 0
             row += 1
 
@@ -186,6 +200,10 @@ img_label.pack(expand=True)
 filename_label = tk.Label(root, text="", font=("Arial", 14))
 filename_label.pack(pady=5)
 
+# Progress Label
+progress_label = tk.Label(root, text="Progress: 0/0", font=("Arial", 12))
+progress_label.pack(pady=5)
+
 # Scrollable Label Selection Area
 label_container = tk.Frame(root)
 label_container.pack(fill="x", padx=10, pady=5)
@@ -194,16 +212,12 @@ label_canvas = Canvas(label_container, height=300)
 label_scrollbar = Scrollbar(label_container, orient="vertical", command=label_canvas.yview)
 
 label_inner_frame = Frame(label_canvas)
-
-label_inner_frame.bind("<Configure>", lambda e: label_canvas.config(scrollregion=label_canvas.bbox("all")))
 label_canvas.create_window((0, 0), window=label_inner_frame, anchor="nw")
 
 label_canvas.config(yscrollcommand=label_scrollbar.set)
 label_canvas.pack(side="left", fill="x", expand=True)
 label_scrollbar.pack(side="right", fill="y")
 
-# Enable mouse wheel scrolling
 label_canvas.bind_all("<MouseWheel>", on_mouse_scroll)
 
-# Run Tkinter App
 root.mainloop()
