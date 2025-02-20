@@ -16,7 +16,7 @@ def load_txt_mapping(txt_file):
                 label_mapping[label] = code  # Map label name to code
     return label_mapping
 
-def map_old_label_name(old_label_name: str, txt_file: str, old_to_new_map: dict, new_label_map: dict):
+def map_old_label_name(i: int, old_label_name: str, txt_file: str, old_to_new_map: dict, new_label_map: dict):
     """
     Maps an old label name to a record with newId and newLabel.
 
@@ -39,6 +39,7 @@ def map_old_label_name(old_label_name: str, txt_file: str, old_to_new_map: dict,
 
     # Get the new ID from the new label
     new_id = next((k for k, v in new_label_map.items() if v == new_label), "Unknown")
+    print(f"{i}. {old_label_name:50} -> {i}. {new_label}")
 
     return {"newId": new_id, "newLabel": new_label}
 
@@ -53,6 +54,10 @@ with open("newLabelMap.json", "r") as file:
 txt_file_path = "Charades_v1_classes.txt"  # Path to your .txt file
 old_label_name_input = "Holding some clothes"  # Example label name
 
-mapped_record = map_old_label_name(old_label_name_input, txt_file_path, old_to_new_label_map, new_label_map)
-
-print(mapped_record)
+if __name__ == "__main__":
+    all_old_labels = []
+    with open(txt_file_path, "r") as file:
+        for line in file:
+            all_old_labels.append(line.strip().split(" ", 1)[1])
+    for i, old_label_name_input in enumerate(all_old_labels):
+        mapped_record = map_old_label_name(i, old_label_name_input, txt_file_path, old_to_new_label_map, new_label_map)

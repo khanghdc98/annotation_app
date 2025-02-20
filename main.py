@@ -44,7 +44,7 @@ def load_images():
             messagebox.showerror("Error", f"Could not read CSV file: {e}")
 
     # Get all images and filter out already annotated ones
-    all_images = [f for f in os.listdir(image_dir) if f.lower().endswith((".png", ".jpg", ".jpeg"))]
+    all_images = sorted([f for f in os.listdir(image_dir) if f.lower().endswith((".png", ".jpg", ".jpeg"))])
     total_images = len(all_images)
     image_list = [img for img in all_images if img not in annotated_images]
 
