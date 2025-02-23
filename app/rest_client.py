@@ -18,15 +18,18 @@ class RestClient:
         payload = {"image_id": image_name, "no_return_records": no_return_records}  # Fix key
 
         try:
-            response = requests.post(url, params=payload, timeout=5)
+            response = requests.get(url, params=payload, timeout=5)
             response.raise_for_status()  # Raise exception for HTTP errors
             
             data = response.json()  # Convert response to JSON first
+            print("Response:", data)
+            data = data['data']
             print("Response:", data)
 
             # Append base_path to each response item if needed
             for i in range(len(data)):
                 data[i] = os.path.join(base_path, data[i])  
+                
 
             return data
         except requests.exceptions.RequestException as e:
