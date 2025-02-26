@@ -11,3 +11,4 @@ annotated_images = set()  # Track already labeled images
 total_images = 0  # Total images in directory
 base_path = ""
 have_base_path = False
+button_per_row=10

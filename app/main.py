@@ -7,7 +7,7 @@ from tkinter import filedialog, messagebox, Canvas, Frame, Scrollbar, Entry, Lab
 from PIL import Image, ImageTk
 from rest_client import RestClient
 from utils import get_path_for_vector_db, get_base_path
-from constant import image_list, current_index, image_dir, output_dir, output_csv, label_data, csv_columns, annotated_images, total_images, base_path, have_base_path, label_file
+from constant import image_list, current_index, image_dir, output_dir, output_csv, label_data, csv_columns, annotated_images, total_images, base_path, have_base_path, label_file, button_per_row
 
 
 api_client = RestClient("http://34.97.0.203:8001")
@@ -232,7 +232,7 @@ def refresh_label_buttons(label_data, label_inner_frame, label_canvas, save_anno
         btn.grid(row=row, column=col, padx=5, pady=5, sticky="w")
 
         col += 1
-        if col >= 11:  # Limit to 11 buttons per row
+        if col >= button_per_row: 
             col = 0
             row += 1
 
