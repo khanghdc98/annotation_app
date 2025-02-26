@@ -58,6 +58,7 @@ def show_propagated_records_dialog(root, base_path, propagated_records, label):
                 if img in temp_img_path:
                     print("removed: ", img_path)
                     image_list.remove(img_path)
+                    print("img annotated", img)
                     annotated_images.add(img)
                     break
         
@@ -267,14 +268,14 @@ def load_images():
 
     # Get all images (absolute paths) and filter out already annotated ones
     all_images = [
-        os.path.join(image_dir, f) for f in os.listdir(image_dir)
+        os.path.join(image_dir, f) for f in os.listdir(image_dir) 
         if f.lower().endswith((".png", ".jpg", ".jpeg"))
     ]
     total_images = len(all_images)
     print(f"Total images: {total_images}")
 
     # Ensure we only load new images
-    image_list = [img for img in all_images if os.path.splitext(get_path_for_vector_db(img))[0] not in annotated_images]
+    image_list = sorted([img for img in all_images if os.path.splitext(get_path_for_vector_db(img))[0] not in annotated_images])
     print(f"New images to label: {len(image_list)}")
 
     if not image_list:
@@ -320,7 +321,6 @@ def save_annotation(label, skip_api_call=False):
      # If API call should be skipped, just append the record to CSV and move to the next image
     if skip_api_call:
         image_name_no_ext = str(os.path.splitext(image_name)[0])
-        print("image_name skipped: ", image_name_no_ext)
         df = pd.DataFrame([[image_name_no_ext, label]], columns=csv_columns)
         df.to_csv(output_csv, mode="a", header=not os.path.exists(output_csv), index=False)
         annotated_images.add(image_name_no_ext)
@@ -346,9 +346,12 @@ def save_annotation(label, skip_api_call=False):
 
     # Propagate label by calling to server
     image_name_no_ext = str(os.path.splitext(image_name)[0])
-    response = api_client.send_annotation(image_name_no_ext, no_return_records=3)
+    response = api_client.send_annotation(image_name_no_ext, no_return_records=10)
     
     propagated_records = response if response else []
+    if len(propagated_records) == 0:
+        save_annotation(label, skip_api_call=True)  # Resume save_annotation but skip API call
+        return
     for record in propagated_records:
         img_full_path = None
         for ext in [".png", ".jpg", ".jpeg"]:

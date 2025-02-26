@@ -22,7 +22,6 @@ class RestClient:
             response.raise_for_status()  # Raise exception for HTTP errors
             
             data = response.json()  # Convert response to JSON first
-            print("Response:", data)
             data = data['data']
             print("Response:", data)
 
