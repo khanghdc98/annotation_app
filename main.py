@@ -48,6 +48,7 @@ def load_images():
     total_images = len(all_images)
     image_list = [img for img in all_images if img not in annotated_images]
 
+
     if not image_list:
         messagebox.showinfo("Info", "No new images to label.")
         return
