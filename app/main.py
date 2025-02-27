@@ -13,11 +13,19 @@ from constant import image_list, current_index, image_dir, output_dir, output_cs
 api_client = RestClient("http://34.97.0.203:8001")
 
 THUMBNAIL_SIZE = (200, 150)  # Thumbnail size
+temp_all_images = []
+
 def show_propagated_records_dialog(root, base_path, propagated_records, label1, label2):
     """
     Opens a dialog to review and remove propagated records before saving.
     """
     global image_list, current_index
+    temp_propagated_records = propagated_records.copy()
+    for record in propagated_records:
+        if record in annotated_images:
+            temp_propagated_records.remove(record)
+    propagated_records = temp_propagated_records
+
     def remove_selected():
         """Removes selected items from propagated_records and image_list, then updates the UI."""
         nonlocal propagated_records
@@ -39,6 +47,7 @@ def show_propagated_records_dialog(root, base_path, propagated_records, label1, 
 
     def submit_records():
         """Writes final propagated records to CSV and updates image list."""
+        nonlocal propagated_records
         if not propagated_records:
             messagebox.showinfo("Info", "No records to save.")
             dialog.destroy()
@@ -46,20 +55,11 @@ def show_propagated_records_dialog(root, base_path, propagated_records, label1, 
             return
 
         # Save the remaining propagated records to CSV
-        print("image name propagated: ", propagated_records)
         df = pd.DataFrame([[filename, label1, label2] for filename in propagated_records], columns=csv_columns)
         df.to_csv(output_csv, mode="a", header=not os.path.exists(output_csv), index=False)
 
-        # Remove saved records from image_list
         for img in propagated_records:
-            for img_path in image_list:
-                temp_img_path = get_path_for_vector_db(img_path).replace("\\", "/")
-                if img in temp_img_path:
-                    print("removed: ", img, temp_img_path, img_path)
-                    # image_list.remove(img_path)
-                    print("img annotated", img, propagated_records, label1, label2)
-                    annotated_images.add(img)
-                    break
+            annotated_images.add(img)
         
         update_progress_label()
 
@@ -125,10 +125,6 @@ def show_propagated_records_dialog(root, base_path, propagated_records, label1, 
     def on_mouse_scroll(event):
         """Enable mouse scroll for the image grid."""
         canvas.yview_scroll(-1 * (event.delta // 120), "units")
-
-    for record in propagated_records:
-        if record in annotated_images:
-            propagated_records.remove(record)
 
     # Create the dialog window
     dialog = tk.Toplevel(root)
@@ -215,9 +211,10 @@ def show_image(current_index, image_list, prev_img_label, img_label, next_img_la
         return
 
     # Get image paths (previous, current, next)
-    prev_image_path = image_list[current_index - 1] if current_index > 0 else None
     current_image_path = image_list[current_index] if current_index < len(image_list) else None
-    next_image_path = image_list[current_index + 1] if current_index + 1 < len(image_list) else None
+    idx_current_in_all_images = temp_all_images.index(current_image_path)
+    prev_image_path = temp_all_images[idx_current_in_all_images - 1] if idx_current_in_all_images > 0 else None
+    next_image_path = temp_all_images[idx_current_in_all_images + 1] if idx_current_in_all_images + 1 < len(image_list) else None
 
     def load_thumbnail(image_path, label_widget, max_height=380):
         """Loads and resizes an image, setting it to the given label widget."""
@@ -237,14 +234,14 @@ def show_image(current_index, image_list, prev_img_label, img_label, next_img_la
                 label_widget.image = img_tk  # Prevent garbage collection
             except Exception as e:
                 print(f"Error loading image {image_path}: {e}")
-                label_widget.config(image="", bg="black")  # Reset if error
+                label_widget.config(image="")  # Reset if error
         else:
-            label_widget.config(image="", bg="black")  # Reset if no image found
+            label_widget.config(image="")  # Reset if no image found
 
     # Load images into labels
-    load_thumbnail(prev_image_path, prev_img_label, max_height=120)
-    load_thumbnail(current_image_path, img_label, max_height=200)
-    load_thumbnail(next_image_path, next_img_label, max_height=120)
+    load_thumbnail(prev_image_path, prev_img_label, max_height=300)
+    load_thumbnail(current_image_path, img_label, max_height=380)
+    load_thumbnail(next_image_path, next_img_label, max_height=300)
 
     # Update filename label
     filename_label.config(text=f"Image: {os.path.basename(current_image_path)}" if current_image_path else "No Image")
@@ -319,6 +316,8 @@ def load_images():
 
     # Ensure we only load new images
     image_list = sorted([img for img in all_images if os.path.splitext(get_path_for_vector_db(img))[0] not in annotated_images])
+    global temp_all_images
+    temp_all_images = sorted(all_images)
     print(f"New images to label: {len(image_list)}")
 
     if not image_list:
@@ -382,7 +381,6 @@ def save_annotation(label1, label2 = "", skip_api_call=False):
     # shutil.copy(os.path.join(image_dir, image_name), os.path.join(label_folder, image_name))
 
     # Propagate label by calling to server
-    print("image_name_no_ext: ", image_name_no_ext)
     show_loading()
     response = None
     try: 
@@ -393,12 +391,12 @@ def save_annotation(label1, label2 = "", skip_api_call=False):
         clear_label_boxes()
         messagebox.showerror("Error", f"Could not send annotation: {e}")
         return
-    
-    hide_loading()
+    finally:  
+        hide_loading()
 
     propagated_records = response if response else []
     if len(propagated_records) == 0:
-        save_annotation(label, skip_api_call=True)  # Resume save_annotation but skip API call
+        save_annotation(label1, label2, skip_api_call=True)  # Resume save_annotation but skip API call
         return
     for record in propagated_records:
         img_full_path = None
@@ -437,7 +435,6 @@ def set_csv_filename():
 
 # Global variables to store selected labels
 selected_labels = ["", ""]  # Store first and second selected labels
-loading_label = None  # Label for displaying loading message
 
 def on_label_click(label):
     """Handles label selection and updates text boxes."""
@@ -466,6 +463,7 @@ def show_loading():
     global loading_label
     loading_label.config(text="Processing...", fg="blue")
     root.update_idletasks()  # Update UI immediately
+    print("show")
 
 def hide_loading():
     """Hides loading message when API request is complete."""
@@ -550,7 +548,7 @@ label_box_2.grid(row=1, column=1, padx=5)
 
 
 # Image Display Area (Three images in a row)
-img_frame = tk.Frame(root, bd=2, relief="solid", height=120, width=507)
+img_frame = tk.Frame(root,relief="solid", height=120, width=507)
 img_frame.pack(fill="x", padx=20, pady=5)
 
 # Ensure equal column expansion
@@ -559,15 +557,15 @@ img_frame.grid_columnconfigure(1, weight=1)
 img_frame.grid_columnconfigure(2, weight=1)
 
 # Left Image (Previous Image)
-prev_img_label = tk.Label(img_frame, bg="black")  
+prev_img_label = tk.Label(img_frame)  
 prev_img_label.grid(row=0, column=0, sticky="nsew", padx=5)
 
 # Center Image (Current Image)
-img_label = tk.Label(img_frame, bg="blue")  
+img_label = tk.Label(img_frame, bg="red")  
 img_label.grid(row=0, column=1, sticky="nsew", padx=5)
 
 # Right Image (Next Image)
-next_img_label = tk.Label(img_frame, bg="red")  
+next_img_label = tk.Label(img_frame)  
 next_img_label.grid(row=0, column=2, sticky="nsew", padx=5)
 
 # Filename Label
