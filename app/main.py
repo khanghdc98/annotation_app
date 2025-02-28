@@ -39,7 +39,7 @@ def show_propagated_records_dialog(root, base_path, propagated_records, label1, 
         selected_images.clear()
         update_grid()
 
-        if not propagated_records:
+        if not propagated_records or len(propagated_records) == 0:
             messagebox.showinfo("Success", "No more images to propagate.")
             dialog.destroy()
             save_annotation(label1, label2, skip_api_call=True)  # Resume save_annotation but skip API call
@@ -545,6 +545,9 @@ label_box_1.grid(row=1, column=0, padx=5)
 
 label_box_2 = tk.Entry(label_box_frame, font=("Arial", 12), width=20, state="readonly")
 label_box_2.grid(row=1, column=1, padx=5)
+
+clear_button = tk.Button(label_box_frame, text="Clear Labels", font=("Arial", 12), command=clear_label_boxes)
+clear_button.grid(row=1, column=2, padx=5)
 
 
 # Image Display Area (Three images in a row)
