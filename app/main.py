@@ -41,9 +41,23 @@ def show_propagated_records_dialog(root, base_path, propagated_records, label1, 
 
         if not propagated_records or len(propagated_records) == 0:
             messagebox.showinfo("Success", "No more images to propagate.")
+            clear_label_boxes()
             dialog.destroy()
             save_annotation(label1, label2, skip_api_call=True)  # Resume save_annotation but skip API call
             return
+
+    def remove_all():
+        """Removes all propagated records and updates the UI."""
+        nonlocal propagated_records
+        propagated_records.clear()  # Clear all records
+        selected_images.clear()  # Clear selected images set
+        update_grid()  # Refresh the UI
+
+        messagebox.showinfo("Success", "All propagated records have been removed.")
+        clear_label_boxes()
+        dialog.destroy()
+        save_annotation(label1, label2, skip_api_call=True)  # Resume save_annotation but skip API call
+
 
     def submit_records():
         """Writes final propagated records to CSV and updates image list."""
@@ -162,11 +176,14 @@ def show_propagated_records_dialog(root, base_path, propagated_records, label1, 
     btn_frame = tk.Frame(dialog)
     btn_frame.pack(fill="x", pady=10)
 
-    remove_btn = tk.Button(btn_frame, text="Remove Selected", command=remove_selected, bg="red", fg="white", width=20, height=2)
-    remove_btn.pack(side="left", padx=10)
+    remove_btn = tk.Button(btn_frame, text="Remove Selected", command=remove_selected, bg="red", fg="white", width=15, height=2)
+    remove_btn.pack(side="left", padx=5)
 
-    submit_btn = tk.Button(btn_frame, text="Submit", command=submit_records, bg="green", fg="white", width=20, height=2)
-    submit_btn.pack(side="right", padx=10)
+    remove_all_btn = tk.Button(btn_frame, text="Remove All", command=remove_all, bg="orange", fg="white", width=15, height=2)
+    remove_all_btn.pack(side="left", padx=5)
+
+    submit_btn = tk.Button(btn_frame, text="Submit", command=submit_records, bg="green", fg="white", width=15, height=2)
+    submit_btn.pack(side="right", padx=5)
 
     dialog.mainloop()
 
