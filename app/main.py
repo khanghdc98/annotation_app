@@ -75,6 +75,16 @@ def show_propagated_records_dialog(root, base_path, propagated_records, label1, 
         for img in propagated_records:
             annotated_images.add(img)
         
+        try:
+            if (api_client.send_accepted_data(propagated_records)):
+                print("Successfully sent accepted data to server.")
+            else:
+                print("Failed to send accepted data to server.")
+                messagebox.showerror("Error", "Failed to send accepted data to server.")
+        except Exception as e:
+            print(f"Error sending accepted data: {e}")
+            messagebox.showerror("Error", f"Failed to send accepted data to server: {e}")
+        
         update_progress_label()
 
         # Update UI to the next available image
@@ -323,6 +333,22 @@ def load_images():
         except Exception as e:
             messagebox.showerror("Error", f"Could not read CSV file: {e}")
 
+    try:
+        if not api_client.clear_session():
+            raise Exception("Could not clear session.")
+    except Exception as e:
+        print(f"Error clearing session: {e}")
+        messagebox.showerror("Error", f"Could not clear session: {e}")
+        return
+
+    try: 
+        if not api_client.send_annotated_data(annotated_images):
+            raise Exception("Could not send annotated data.")
+    except Exception as e:
+        print(f"Error sending past data: {e}")
+        messagebox.showerror("Error", f"Could not load_images: {e}")
+        return
+
     # Get all images (absolute paths) and filter out already annotated ones
     all_images = [
         os.path.join(image_dir, f) for f in os.listdir(image_dir) 
@@ -401,7 +427,7 @@ def save_annotation(label1, label2 = "", skip_api_call=False):
     show_loading()
     response = None
     try: 
-        response = api_client.send_annotation(image_name_no_ext, no_return_records=10)
+        response = api_client.get_similars(image_name_no_ext, no_return_records=10)
     except Exception as e:
         print(f"Error sending annotation: {e}")
         hide_loading()
@@ -520,6 +546,16 @@ def move_to_next_image():
 # Exit function
 def on_exit(root):
     """Ensures all Tkinter windows close properly."""
+    try:
+        if api_client.clear_session():
+            print("Successfully cleared session.")
+        else:
+            print("Failed to clear session.")
+            messagebox.showerror("Error", "Failed to clear session to shut down.")
+    except Exception as e:
+        print(f"Error clearing session: {e}")
+        messagebox.showerror("Error", f"Failed to clear session: {e}")
+
     for window in root.winfo_children():  # Close any open dialogs
         window.destroy()
     root.quit()
