@@ -175,3 +175,4 @@ annotations.csv
 app/annotations.csv
 *.csv
 app/*.csv
+app/.env
