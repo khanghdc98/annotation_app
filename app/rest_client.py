@@ -18,13 +18,13 @@ class RestClient:
         return cls._instance
 
     def get_similars(self, image_name, no_return_records):
-        url = f"{self.base_url}/get_similar"  # Adjust endpoint as needed
-        payload = {"image_id": image_name, "no_return_records": no_return_records}  # Fix key
+        url = f"{self.base_url.replace('8004', '8001')}/get_similar"
+        payload = {"image_id": image_name, "no_return_records": no_return_records} 
 
         response = requests.get(url, params=payload, timeout=5)
-        response.raise_for_status()  # Raise exception for HTTP errors
+        response.raise_for_status() 
         
-        data = response.json()  # Convert response to JSON first
+        data = response.json()
         data = data['data']
 
         # Append base_path to each response item if needed
@@ -34,11 +34,15 @@ class RestClient:
 
         return data
     
-    def send_annotated_data(self, annotated_images, session_id=None):
+    def init(self, video_id, annotated_images, session_id=None):
         if session_id is None:
             session_id = self.user_id
-        url = f"{self.base_url}/send_annotated_data"
-        payload = {"session_id": session_id, "annotated_images": annotated_images}
+        url = f"{self.base_url}/init"
+        image_ids = []
+        for image in annotated_images:
+            image_ids.append(image.split("/")[-1])
+        payload = {"user": session_id, "video_id": video_id, "prev_ann_image_ids": image_ids}
+        print(payload)
 
         response = requests.post(url, json=payload, timeout=5)
         response.raise_for_status()
@@ -51,8 +55,8 @@ class RestClient:
     def clear_session(self, session_id=None):
         if session_id is None:
             session_id = self.user_id
-        url = f"{self.base_url}/clear_session"
-        payload = {"session_id": session_id}
+        url = f"{self.base_url}/clear"
+        payload = {"user": session_id}
 
         response = requests.post(url, json=payload, timeout=5)
         response.raise_for_status()
@@ -65,8 +69,9 @@ class RestClient:
     def send_accepted_data(self, accepted_images, session_id=None):
         if session_id is None:
             session_id = self.user_id
-        url = f"{self.base_url}/send_accepted_data"
-        payload = {"session_id": session_id, "accepted_images": accepted_images}
+        url = f"{self.base_url}/update"
+        payload = {"user": session_id, "new_ann_image_ids": accepted_images}
+        print(payload)
 
         response = requests.post(url, json=payload, timeout=5)
         response.raise_for_status()
