@@ -260,10 +260,10 @@ def show_image(current_index, image_list, prev_img_label, img_label, next_img_la
         return
 
     # Get image paths (previous, current, next)
-    current_image_path = image_list[current_index] if current_index < len(image_list) else None
+    current_image_path = image_list[current_index] if current_index < len(temp_all_images) else None
     idx_current_in_all_images = temp_all_images.index(current_image_path)
     prev_image_path = temp_all_images[idx_current_in_all_images - 1] if idx_current_in_all_images > 0 else None
-    next_image_path = temp_all_images[idx_current_in_all_images + 1] if idx_current_in_all_images + 1 < len(image_list) else None
+    next_image_path = temp_all_images[idx_current_in_all_images + 1] if idx_current_in_all_images + 1 < len(temp_all_images) else None
 
     def load_thumbnail(image_path, label_widget, max_height=380):
         """Loads and resizes an image, setting it to the given label widget."""

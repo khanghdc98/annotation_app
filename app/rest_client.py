@@ -41,7 +41,7 @@ class RestClient:
         image_ids = []
         for image in annotated_images:
             image_ids.append(image.split("/")[-1])
-        payload = {"user": session_id, "video_id": video_id, "prev_ann_image_ids": image_ids}
+        payload = {"user": session_id, "video_id": video_id, "prev_ann_image_ids": annotated_images}
         print(payload)
 
         response = requests.post(url, json=payload, timeout=5)
