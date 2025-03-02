@@ -10,10 +10,11 @@ from utils import get_path_for_vector_db, get_base_path
 from constant import image_list, current_index, image_dir, output_dir, output_csv, label_data, csv_columns, annotated_images, total_images, base_path, have_base_path, label_file, button_per_row
 
 
-api_client = RestClient("http://34.97.0.203:8001")
+api_client = RestClient("http://34.97.0.203:8004")
 
 THUMBNAIL_SIZE = (200, 150)  # Thumbnail size
 temp_all_images = []
+current_video_id = ""
 
 def show_propagated_records_dialog(root, base_path, propagated_records, label1, label2):
     """
@@ -43,6 +44,15 @@ def show_propagated_records_dialog(root, base_path, propagated_records, label1, 
             messagebox.showinfo("Success", "No more images to propagate.")
             clear_label_boxes()
             dialog.destroy()
+            try:
+                if (api_client.send_accepted_data([get_path_for_vector_db(image_list[current_index]).split(".")[0]])):
+                    print("Successfully sent accepted data to server.")
+                else:
+                    print("Failed to send accepted data to server.")
+                    messagebox.showerror("Error", "Failed to send accepted data to server.")
+            except Exception as e:
+                print(f"Error sending accepted data: {e}")
+                messagebox.showerror("Error", f"Failed to send accepted data to server: {e}")
             save_annotation(label1, label2, skip_api_call=True)  # Resume save_annotation but skip API call
             return
 
@@ -56,6 +66,15 @@ def show_propagated_records_dialog(root, base_path, propagated_records, label1, 
         messagebox.showinfo("Success", "All propagated records have been removed.")
         clear_label_boxes()
         dialog.destroy()
+        try:
+            if (api_client.send_accepted_data([get_path_for_vector_db(image_list[current_index]).split(".")[0]])):
+                print("Successfully sent accepted data to server.")
+            else:
+                print("Failed to send accepted data to server.")
+                messagebox.showerror("Error", "Failed to send accepted data to server.")
+        except Exception as e:
+            print(f"Error sending accepted data: {e}")
+            messagebox.showerror("Error", f"Failed to send accepted data to server: {e}")
         save_annotation(label1, label2, skip_api_call=True)  # Resume save_annotation but skip API call
 
 
@@ -74,6 +93,19 @@ def show_propagated_records_dialog(root, base_path, propagated_records, label1, 
 
         for img in propagated_records:
             annotated_images.add(img)
+        
+        try:
+            temp_records = propagated_records.copy()
+            temp_records.append(get_path_for_vector_db(image_list[current_index]).split(".")[0])
+            print(temp_records)
+            if (api_client.send_accepted_data(temp_records)):
+                print("Successfully sent accepted data to server.")
+            else:
+                print("Failed to send accepted data to server.")
+                messagebox.showerror("Error", "Failed to send accepted data to server.")
+        except Exception as e:
+            print(f"Error sending accepted data: {e}")
+            messagebox.showerror("Error", f"Failed to send accepted data to server: {e}")
         
         update_progress_label()
 
@@ -323,6 +355,26 @@ def load_images():
         except Exception as e:
             messagebox.showerror("Error", f"Could not read CSV file: {e}")
 
+    global current_video_id
+    try:
+        video_id = "/".join(image_dir.split("/")[-2:])
+        current_video_id = video_id
+        if not api_client.init(video_id,[]):
+            raise Exception("Could not clear session.")
+    except Exception as e:
+        print(f"Error clearing session: {e}")
+        messagebox.showerror("Error", f"Could not clear session: {e}")
+        return
+
+    try: 
+        temp = list(annotated_images)
+        if not api_client.init(current_video_id, temp):
+            raise Exception("Could not send annotated data.")
+    except Exception as e:
+        print(f"Error sending past data: {e}")
+        messagebox.showerror("Error", f"Could not load_images: {e}")
+        return
+
     # Get all images (absolute paths) and filter out already annotated ones
     all_images = [
         os.path.join(image_dir, f) for f in os.listdir(image_dir) 
@@ -401,7 +453,7 @@ def save_annotation(label1, label2 = "", skip_api_call=False):
     show_loading()
     response = None
     try: 
-        response = api_client.send_annotation(image_name_no_ext, no_return_records=10)
+        response = api_client.get_similars(image_name_no_ext, no_return_records=10)
     except Exception as e:
         print(f"Error sending annotation: {e}")
         hide_loading()
@@ -520,6 +572,17 @@ def move_to_next_image():
 # Exit function
 def on_exit(root):
     """Ensures all Tkinter windows close properly."""
+    try:
+        global current_video_id
+        if api_client.init(current_video_id, []):
+            print("Successfully cleared session.")
+        else:
+            print("Failed to clear session.")
+            messagebox.showerror("Error", "Failed to clear session to shut down.")
+    except Exception as e:
+        print(f"Error clearing session: {e}")
+        messagebox.showerror("Error", f"Failed to clear session: {e}")
+
     for window in root.winfo_children():  # Close any open dialogs
         window.destroy()
     root.quit()

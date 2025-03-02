@@ -1,10 +1,14 @@
+from dotenv import load_dotenv
+import os
+
 # Global variables
 image_list = []
 current_index = 0
 image_dir = ""
 output_dir = ""
 output_csv = "annotations.csv"
-label_file = "/Users/user/Documents/Projects/annotation_app/unique_new_labels.json"
+load_dotenv()
+label_file = os.getenv("LABEL_FILE")
 label_data = []
 csv_columns = ["image_filename", "main label", "concurrent label"]
 annotated_images = set()  # Track already labeled images
