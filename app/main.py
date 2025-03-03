@@ -15,6 +15,7 @@ api_client = RestClient("http://34.97.0.203:8004")
 THUMBNAIL_SIZE = (200, 150)  # Thumbnail size
 temp_all_images = []
 current_video_id = ""
+no_return_records = 10  # Default value
 
 def show_propagated_records_dialog(root, base_path, propagated_records, label1, label2):
     """
@@ -310,15 +311,20 @@ def refresh_label_buttons(label_data, label_inner_frame, label_canvas, save_anno
     # Sort labels alphabetically before displaying
     sorted_labels = sorted(label_data)
 
+    # Button size settings
+    button_width = 13   # Fixed width (characters)
+    button_height = 2   # Fixed height (lines)
+
     # Create buttons dynamically
     row, col = 0, 0
     for label in sorted_labels:
         btn = tk.Button(
             label_inner_frame, text=label, font=("Arial", 10), 
+            wraplength=100,
             command=lambda l=label: save_annotation(l), 
-            bg="lightgray", wraplength=100, anchor="center"  # Auto-fit content
+            bg="lightgray", width=button_width, height=button_height
         )
-        btn.grid(row=row, column=col, padx=5, pady=5, sticky="w")
+        btn.grid(row=row, column=col, padx=5, pady=5)
 
         col += 1
         if col >= button_per_row: 
@@ -328,6 +334,7 @@ def refresh_label_buttons(label_data, label_inner_frame, label_canvas, save_anno
     # Update scroll region
     label_canvas.update_idletasks()
     label_canvas.config(scrollregion=label_canvas.bbox("all"))
+
 
 # Load labels from JSON file
 def load_labels():
@@ -453,7 +460,7 @@ def save_annotation(label1, label2 = "", skip_api_call=False):
     show_loading()
     response = None
     try: 
-        response = api_client.get_similars(image_name_no_ext, no_return_records=10)
+        response = api_client.get_similars(image_name_no_ext, no_return_records=no_return_records)
     except Exception as e:
         print(f"Error sending annotation: {e}")
         hide_loading()
@@ -588,6 +595,12 @@ def on_exit(root):
     root.quit()
     root.destroy()  # Fully terminate the application
 
+def update_no_return_records(value):
+    """Updates the global variable with the selected slider value."""
+    global no_return_records
+    no_return_records = int(value)
+
+
 # Tkinter GUI Setup
 root = tk.Tk()
 root.title("Image Annotation Tool")
@@ -613,6 +626,13 @@ Label(csv_frame, text="Output CSV:", font=("Arial", 12)).pack(side="left", padx=
 csv_entry = Entry(csv_frame, font=("Arial", 12), width=30)
 csv_entry.pack(side="left", padx=5)
 tk.Button(csv_frame, text="Set", font=("Arial", 12), command=set_csv_filename).pack(side="left", padx=5)
+
+# Slider for controlling no_return_records
+Label(csv_frame, text="Returned Records: ", font=("Arial", 8)).pack(side="left", padx=5)
+slider = tk.Scale(csv_frame, from_=10, to=30, orient="horizontal", length=200,
+                  font=("Arial", 10), command=update_no_return_records)
+slider.pack(side="left", padx=10)
+slider.set(no_return_records)  # Set initial value to default
 
 # Label Selection Input Box
 label_box_frame = tk.Frame(root)
