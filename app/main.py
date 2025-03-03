@@ -579,17 +579,6 @@ def move_to_next_image():
 # Exit function
 def on_exit(root):
     """Ensures all Tkinter windows close properly."""
-    try:
-        global current_video_id
-        if api_client.init(current_video_id, []):
-            print("Successfully cleared session.")
-        else:
-            print("Failed to clear session.")
-            messagebox.showerror("Error", "Failed to clear session to shut down.")
-    except Exception as e:
-        print(f"Error clearing session: {e}")
-        messagebox.showerror("Error", f"Failed to clear session: {e}")
-
     for window in root.winfo_children():  # Close any open dialogs
         window.destroy()
     root.quit()
