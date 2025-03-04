@@ -33,7 +33,7 @@
 202006/
 ```
 
-**Danh sách labels**: Xem ở `unique_new_labels.json`
+**Danh sách labels**: Xem ở `unique_new_labels.json`. Người dùng có thể làm quen với các label (và vị trí của chúng trong app) để quá trình dán nhãn diễn ra nhanh chóng.
 
 ---
 
@@ -60,10 +60,10 @@
     
     ```
     | Hình ảnh | Main Action | Concurrent Action |
-    |--------------------------|-------------|-------------------|
-    | Ảnh 1	               | attending a presentation sách    |                   |
-    | Ảnh 2  	               | using computer | attending a presentation          |
-    | Ảnh 3		       | attending a presentation |           |
+    | --- | --- | --- |
+    | Ảnh 1	| attending a presentation | |
+    | Ảnh 2 | using computer | attending a presentation |
+    | Ảnh 3	| attending a presentation | |
     ```
 - Các ảnh được propagate phải có **main action và concurrent action (nếu có)** giống hoàn toàn với ảnh ban đầu.
 
@@ -77,7 +77,7 @@
 2. Click **Set** để lưu tên file.
 3. Click **Load Images** và chọn thư mục cần label. Lưu ý là chọn thư mục ứng với 1 ngày (VD: `201901/01`).
 4. *(Nếu cần thiết)* Điều chỉnh thanh slider **Returned Records** để giới hạn số kết quả trả về.
-5. Khi ảnh hiển ra, click vào tên các label được hiển thị bên dưới để chọn label.
+5. Khi ảnh hiện ra, click vào tên các label được hiển thị bên dưới để chọn label.
    - Nếu ảnh có **2 label**, sau khi chọn 2 label, cửa sổ các hình ảnh cần được propagate sẽ tự động hiện ra.
    - Nếu ảnh có **1 label**, sau khi chọn 1 label, nhấn **Tab** để cửa sổ các hình ảnh hiện ra.
    - Có thể click **Clear Labels** để xóa labels rồi dán nhãn lại.
