@@ -12,8 +12,8 @@
 - Được thu thập từ một giáo sư người Ireland trong thời gian từ 01/2019 - 06/2020.
 - Gồm dữ liệu ảnh của ~530 ngày, mỗi ngày khoảng 1000-2000 hình ảnh.
 - Tổng số lượng ảnh: ~725k.
-- Kích thước bộ dữ liệu: ~55GB.
-- **Link**: ... *(link riêng tư, liên hệ chủ project để tải về)*
+- Kích thước bộ dữ liệu: ~50GB.
+- **Link daátaset**: link riêng tư, liên hệ chủ project để tải về.
 
 ### Cấu trúc thư mục:
 ```
@@ -66,8 +66,18 @@
     
 - Các ảnh được propagate phải có **main action và concurrent action (nếu có)** giống hoàn toàn với ảnh ban đầu.
 
-### Một số trường hợp đặc biệt
-*(Bổ sung nội dung tại đây nếu cần)*
+### Một số trường hợp đặc biệt| Case | Hình ảnh | Main Label | Concurrent Label | Giải thích |
+|---|---|---|---|---|
+| 1a. Giơ điện thoại lên chụp hình | <img> | taking a photo | using mobile device | |       
+| 1b. Có điện thoại trong ảnh nhưng không chụp hình | <img> | using mobile device | *Tùy trường hợp* | |
+| 2a. Ngồi ăn với 1 người nào đó (không nhìn thấy đồ ăn nhưng biết là đang ngồi ăn) | <img> | having a conversation | eating | |
+| 2b. Ngồi ăn với 1 người nào đó, thấy đồ ăn nhưng người đối diện đang mở miệng ra nói chuyện | <img> | having a conversation | eating | |
+| 2c. Ngồi ăn với 1 người nào đó (nhìn thấy bàn đồ ăn) | <img> | eating | having a conversation | |
+| 2d. Ngồi uống với 1 người nào đó, thấy đồ uống nhưng người đối diện đang mở miệng ra nói chuyện | <img> | having a conversation | drinking | |
+| 2e. Trên bàn vừa có đồ ăn, đồ uống nhưng không thấy tay cầm ly đồ uống | <img> | eating | *Tùy trường hợp mà drinking hoặc having a conversation* | Ưu tiên eating > having a drink |
+| 3a. Cầm sách, báo, menu lên đọc | <img> | reading documents | *Tùy trường hợp* | |
+| 3b. 1 bàn giấy trong văn phòng, có nhiều giấy tờ/dụng cụ/thiết bị | <img> | doing office work | *Tùy trường hợp* | |
+| 3c. 1 bàn giấy trong văn phòng, có nhiều giấy tờ/dụng cụ/thiết bị, có sử dụng máy tính | <img> | using computer | doing office work | |
 
 ---
 
