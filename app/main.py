@@ -312,7 +312,7 @@ def refresh_label_buttons(label_data, label_inner_frame, label_canvas, save_anno
     sorted_labels = sorted(label_data)
 
     # Button size settings
-    button_width = 13   # Fixed width (characters)
+    button_width = 11   # Fixed width (characters)
     button_height = 2   # Fixed height (lines)
 
     # Create buttons dynamically
@@ -601,7 +601,7 @@ top_frame.pack(fill="x", pady=1)
 
 tk.Button(top_frame, text="Load Labels", font=("Arial", 12), command=load_labels).pack(side="left", padx=10)
 tk.Button(top_frame, text="Load Images", font=("Arial", 12), command=load_images).pack(side="left", padx=10)
-tk.Button(top_frame, text="Set Output Folder", font=("Arial", 12), command=select_output_folder).pack(side="left", padx=10)
+# tk.Button(top_frame, text="Set Output Folder", font=("Arial", 12), command=select_output_folder).pack(side="left", padx=10)
 tk.Button(top_frame, text="Exit", font=("Arial", 12), command=lambda: on_exit(root), fg="white", bg="red").pack(side="right", padx=10)
 
 # Loading Label
