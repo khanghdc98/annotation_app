@@ -72,7 +72,7 @@
 |---|---|---|---|---|
 | 0a. Di chuyển trong nhà, di chuyển liên tục (nhận diện qua việc xem các ảnh liên tiếp) | <img> | walking indoor | *Tùy trường hợp* | |
 | 0b. Trong nhà, đứng/ngồi lâu một chỗ | <img> | NO ACTIVITY | |
-| 1a. Giơ điện thoại lên chụp hình | <img> | taking a photo | using mobile device | |       
+| 1a. Giơ điện thoại lên chụp hình | <img src="img/case_1a_takingphoto.png"> | taking a photo | using mobile device | |       
 | 1b. Có điện thoại trong ảnh nhưng không chụp hình | <img> | using mobile device | *Tùy trường hợp* | |
 | 2a. Ngồi ăn với 1 người nào đó (không nhìn thấy đồ ăn nhưng biết là đang ngồi ăn) | <img> | having a conversation | eating | |
 | 2b. Ngồi ăn với 1 người nào đó, thấy đồ ăn nhưng người đối diện đang mở miệng ra nói chuyện | <img> | having a conversation | eating | |
