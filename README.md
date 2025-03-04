@@ -39,7 +39,7 @@
 
 ## Hướng dẫn cài đặt
 
-1. `git clone ...`
+1. `git clone https://github.com/khanghdc98/annotation_app.git`
 2. `python main/app.py`
 
 ## Mô tả
