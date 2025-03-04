@@ -66,7 +66,8 @@
     
 - Các ảnh được propagate phải có **main action và concurrent action (nếu có)** giống hoàn toàn với ảnh ban đầu.
 
-### Một số trường hợp đặc biệt| Case | Hình ảnh | Main Label | Concurrent Label | Giải thích |
+### Một số trường hợp đặc biệt
+| Case | Hình ảnh | Main Label | Concurrent Label | Giải thích |
 |---|---|---|---|---|
 | 1a. Giơ điện thoại lên chụp hình | <img> | taking a photo | using mobile device | |       
 | 1b. Có điện thoại trong ảnh nhưng không chụp hình | <img> | using mobile device | *Tùy trường hợp* | |
