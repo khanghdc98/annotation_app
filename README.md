@@ -65,10 +65,13 @@
     | Ảnh 3	| attending a presentation | |
     
 - Các ảnh được propagate phải có **main action và concurrent action (nếu có)** giống hoàn toàn với ảnh ban đầu.
+- Các ảnh không có thông tin/cam lia nhanh/chỉ có duy nhất 1 màu/không xác định được hành động gì được dán nhãn là NO ACTIVITY.
 
 ### Một số trường hợp đặc biệt
 | Case | Hình ảnh | Main Label | Concurrent Label | Giải thích |
 |---|---|---|---|---|
+| 0a. Di chuyển trong nhà, di chuyển liên tục (nhận diện qua việc xem các ảnh liên tiếp) | <img> | walking indoor | *Tùy trường hợp* | |
+| 0b. Trong nhà, đứng/ngồi lâu một chỗ | <img> | NO ACTIVITY | |
 | 1a. Giơ điện thoại lên chụp hình | <img> | taking a photo | using mobile device | |       
 | 1b. Có điện thoại trong ảnh nhưng không chụp hình | <img> | using mobile device | *Tùy trường hợp* | |
 | 2a. Ngồi ăn với 1 người nào đó (không nhìn thấy đồ ăn nhưng biết là đang ngồi ăn) | <img> | having a conversation | eating | |
@@ -79,6 +82,11 @@
 | 3a. Cầm sách, báo, menu lên đọc | <img> | reading documents | *Tùy trường hợp* | |
 | 3b. 1 bàn giấy trong văn phòng, có nhiều giấy tờ/dụng cụ/thiết bị | <img> | doing office work | *Tùy trường hợp* | |
 | 3c. 1 bàn giấy trong văn phòng, có nhiều giấy tờ/dụng cụ/thiết bị, có sử dụng máy tính | <img> | using computer | doing office work | |
+| 4a. Đi siêu thị, đang di chuyển (đi vào cửa, đi dọc các lối đi, nhòe khung hình,...) | <img> | shopping | walking indoor | |
+| 4b. Đi siêu thị, đứng cận quầy sản phẩm để xem hàng/đứng ở quầy thanh toán | <img> | shopping | *Tùy trường hợp* | |
+| 5a. Trong lớp học/phòng họp/... có thấy slide trình chiếu | <img> | attending a presentation | *Tùy trường hợp* | Có sử dụng slide có nghĩa là đang trình bày 1 chủ đề nào đó |
+| 5b. Trong lớp học/phòng họp/... không thấy slide trình chiếu nhưng có 1 người đang trình bày ở vị trí cao hơn hẳn (có thể đứng hoặc ngồi) | <img> | attending a presentation | *Tùy trường hợp* | Thầy thường đứng lớp ở vị trí giảng viên |
+| 5c. Trong lớp học/phòng họp/... không thấy slide trình chiếu, mọi người có vị trí ngang nhau, giống một cuộc thảo luận | <img> | attending a meeting | *Tùy trường hợp* | Thảo luận đơn thuần dùng lời nói để trình bày |
 
 ---
 
