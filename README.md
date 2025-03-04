@@ -42,9 +42,9 @@
 1. `git clone ...`
 2. `python main/app.py`
 
-## Yêu cầu chung
+## Mô tả
 - Mỗi ảnh có đúng **1 main action** và tối đa **1 concurrent action**. Main action là hành động chính, nổi bật trong bức ảnh, concurrent action là hành động diễn ra đồng thời với main action, có tầm quan trọng thấp hơn.
-- Action label của 1 hình ảnh có thể được dùng để dán nhãn đồng loạt (**propagate**) cho nhiều hình ảnh tương đồng trong tập dữ liệu (**tối thiểu 10, tối đa 30**).
+- Action label của 1 hình ảnh có thể được dùng để **propagate** (dán nhãn đồng loạt) cho nhiều hình ảnh tương đồng trong tập dữ liệu (**tối thiểu 10, tối đa 30**). Việc này giúp đẩy nhanh tốc độ dán nhãn dữ liệu.
 - Xuất file output theo format: `yyyymmdd.csv`
 
 ### Một số quy tắc:
@@ -73,5 +73,16 @@
 ---
 
 ## Hướng dẫn sử dụng
-*(Bổ sung nội dung hướng dẫn sử dụng tại đây)*
-
+1. Nhập tên file (`yyyymmdd`) vào text box **Output CSV**.
+2. Click **Set** để lưu tên file.
+3. Click **Load Images** và chọn thư mục cần label. Lưu ý là chọn thư mục ứng với 1 ngày (VD: `201901/01`).
+4. *(Nếu cần thiết)* Điều chỉnh thanh slider **Returned Records** để giới hạn số kết quả trả về.
+5. Khi ảnh hiển ra, click vào tên các label được hiển thị bên dưới để chọn label.
+   - Nếu ảnh có **2 label**, sau khi chọn 2 label, cửa sổ các hình ảnh cần được propagate sẽ tự động hiện ra.
+   - Nếu ảnh có **1 label**, sau khi chọn 1 label, nhấn **Tab** để cửa sổ các hình ảnh hiện ra.
+   - Có thể click **Clear Labels** để xóa labels rồi dán nhãn lại.
+6. Cửa sổ hiện ra các hình ảnh được app gợi ý để propagate.
+   - Có thể chọn nhiều ảnh, sau đó click **Remove Selected** để không propagate sang các ảnh này.
+   - Click **Submit** để xác nhận propagate các ảnh này. Thông tin dán nhãn sẽ được lưu trong file CSV.
+   - Có thể click **Remove All** để không propagate ảnh nào. Khi đó không cần click **Submit**.
+     - **Lưu ý**: Sau khi click **Remove All**, app sẽ hiển ra một dialog, người dùng chỉ cần click **OK** để dán nhãn ảnh tiếp theo. Tuy nhiên, đôi khi app hiện ra 2 dialog, việc click **OK** 2 lần vô tình dán nhãn 2 lần, khiến cho ảnh thứ hai bị label sai. Có thể quan sát ảnh này và sửa trực tiếp vào file CSV.
