@@ -56,15 +56,14 @@
       <img src="img/20191031_135054_000.jpg" width="200px" style="margin-right: 10px;">
       <img src="img/20191031_135325_000.jpg" width="200px" style="margin-right: 10px;">
       <img src="img/20191031_135359_000.jpg" width="200px">
-    </div>
+    </div>    
     
-    ```
     | Hình ảnh | Main Action | Concurrent Action |
     | --- | --- | --- |
     | Ảnh 1	| attending a presentation | |
     | Ảnh 2 | using computer | attending a presentation |
     | Ảnh 3	| attending a presentation | |
-    ```
+    
 - Các ảnh được propagate phải có **main action và concurrent action (nếu có)** giống hoàn toàn với ảnh ban đầu.
 
 ### Một số trường hợp đặc biệt
