@@ -82,9 +82,9 @@
 | 3a. Cầm sách, báo, menu lên đọc | <img src="img/20191130_135743_000.jpg"> | reading documents | *Tùy trường hợp* | |
 | 3b. 1 bàn giấy trong văn phòng, có nhiều giấy tờ/dụng cụ/thiết bị | <img src="img/20191031_080358_000.jpg"> <img src="img/20191031_083135_000.jpg"> | doing office work | *Tùy trường hợp* | |
 | 3c. 1 bàn giấy trong văn phòng, có nhiều giấy tờ/dụng cụ/thiết bị, có sử dụng máy tính | <img src="img/20191031_091938_000.jpg"> | using computer | doing office work | |
-| 4a. Đi siêu thị, đang di chuyển (đi vào cửa, đi dọc các lối đi, nhòe khung hình,...) | <img> | shopping | walking indoor | |
-| 4b. Đi siêu thị, đứng cận quầy sản phẩm để xem hàng/đứng ở quầy thanh toán | <img> | shopping | *Tùy trường hợp* | |
-| 5a. Trong lớp học/phòng họp/... có thấy slide trình chiếu | <img> | attending a presentation | *Tùy trường hợp* | Có sử dụng slide có nghĩa là đang trình bày 1 chủ đề nào đó |
+| 4a. Đi siêu thị, đang di chuyển (đi vào cửa, đi dọc các lối đi, nhòe khung hình,...) | <img src="img/20191130_195043_000.jpg"> | shopping | walking indoor | |
+| 4b. Đi siêu thị, đứng cận quầy sản phẩm để xem hàng/đứng ở quầy thanh toán | <img src="img/20191130_195117_000.jpg"> | shopping | *Tùy trường hợp* | |
+| 5a. Trong lớp học/phòng họp/... có thấy slide trình chiếu | <img src="img/20191031_143533_000.jpg"> | attending a presentation | *Tùy trường hợp* | Có sử dụng slide có nghĩa là đang trình bày 1 chủ đề nào đó |
 | 5b. Trong lớp học/phòng họp/... không thấy slide trình chiếu nhưng có 1 người đang trình bày ở vị trí cao hơn hẳn (có thể đứng hoặc ngồi) | <img src="img/20191031_135054_000.jpg"> | attending a presentation | *Tùy trường hợp* | Thầy thường đứng lớp ở vị trí giảng viên |
 | 5c. Trong lớp học/phòng họp/... không thấy slide trình chiếu, mọi người có vị trí ngang nhau, giống một cuộc thảo luận | <img> | attending a meeting | *Tùy trường hợp* | Thảo luận đơn thuần dùng lời nói để trình bày |
 
