@@ -500,7 +500,10 @@ def save_annotation(label1, label2 = "", skip_api_call=False):
 # Set custom CSV filename
 def set_csv_filename():
     global output_csv
+<<<<<<< HEAD
     print("CSV file: ", csv_entry.get())
+=======
+>>>>>>> 58bef84ab351689617deb331650a28ee7ba35538
     filename = csv_entry.get().strip()
     if filename:
         if not filename.endswith(".csv"):

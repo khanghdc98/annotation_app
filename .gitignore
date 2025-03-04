@@ -170,4 +170,9 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
+
+annotations.csv
+app/annotations.csv
 *.csv
+app/*.csv
+app/.env
