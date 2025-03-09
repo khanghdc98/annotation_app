@@ -3,11 +3,12 @@ from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 import os
 import requests
+import csv
 from file_handler import get_filtered_images, save_approved_image
 from image_display import get_full_image_path
 from api_handler import get_neighbors
 from merge_output import merge_csv_files
-from config import OUTPUT_DIR
+from config import OUTPUT_DIR, TEMP_DIR
 
 API_URL = "http://34.97.0.203:8001/explore/explore_neighbor_images"
 
@@ -86,6 +87,11 @@ class ImageReviewApp:
         self.select_file_btn = tk.Button(root, text="Select CSV File", command=self.select_file)
         self.select_file_btn.pack(pady=10)
 
+        # Bind "A" key to approve and "D" key to decline
+        self.root.bind("<a>", lambda event: self.approve_image())
+        self.root.bind("<d>", lambda event: self.skip_image())
+
+
     def select_file(self):
         """Opens file dialog and loads images from CSV"""
         file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
@@ -115,16 +121,38 @@ class ImageReviewApp:
         for widget in self.right_canvas.winfo_children():
             widget.destroy()
 
+    # def display_image(self, canvas, image_path, size, row=0, col=0):
+    #     """Displays an image in the given canvas using a grid layout."""
+    #     if image_path and os.path.exists(image_path):
+    #         img = Image.open(image_path)
+    #         img = img.resize(size, Image.Resampling.LANCZOS)
+    #         img_tk = ImageTk.PhotoImage(img)
+
+    #         label = tk.Label(canvas, image=img_tk)
+    #         label.image = img_tk  # Keep reference
+    #         label.grid(row=row, column=col, padx=5, pady=5)  # Place in grid
+    
     def display_image(self, canvas, image_path, size, row=0, col=0):
         """Displays an image in the given canvas using a grid layout."""
         if image_path and os.path.exists(image_path):
             img = Image.open(image_path)
             img = img.resize(size, Image.Resampling.LANCZOS)
+            
+            # Convert to Tkinter-compatible format
             img_tk = ImageTk.PhotoImage(img)
 
+            # Destroy previous widgets in this frame before adding a new image
+            for widget in canvas.winfo_children():
+                widget.destroy()
+
+            # Display new image
             label = tk.Label(canvas, image=img_tk)
-            label.image = img_tk  # Keep reference
-            label.grid(row=row, column=col, padx=5, pady=5)  # Place in grid
+            label.image = img_tk  # Keep reference to prevent garbage collection
+            label.grid(row=row, column=col, padx=5, pady=5)
+
+            # Force garbage collection of old images
+            img.close()
+
 
     def update_progress(self):
         """Updates progress label and checks if all images are reviewed."""
@@ -155,12 +183,51 @@ class ImageReviewApp:
     def approve_image(self):
         """Approves the current image"""
         if self.images:
-            save_approved_image(self.action_label, self.images[self.current_index])
+            image_url = self.images[self.current_index]
+            save_approved_image(self.action_label, image_url)
+
+             # Remove from declined CSV if it was previously declined
+            declined_csv_path = f"{TEMP_DIR}/declined_{self.action_label}.csv"
+            if os.path.exists(declined_csv_path):
+                with open(declined_csv_path, "r") as f:
+                    declined_images = set(line.strip() for line in f.readlines())
+
+                if image_url in declined_images:
+                    declined_images.remove(image_url)
+                    with open(declined_csv_path, "w") as f:
+                        f.writelines(f"{img}\n" for img in declined_images)
+
             self.load_next()
 
     def skip_image(self):
-        """Skips the current image"""
-        self.load_next()
+        """Skips the current image. If the image was approved before, remove it from the output CSV."""
+        if self.images:
+            image_to_remove = self.images[self.current_index]
+            output_csv_path = f"{TEMP_DIR}/temp_golden_corpus_for_{self.action_label}.csv"
+
+            if os.path.exists(output_csv_path):
+                # Read the existing approved images
+                with open(output_csv_path, "r") as f:
+                    lines = f.readlines()
+
+                # Filter out the image if it was approved before
+                updated_lines = [line for line in lines if image_to_remove not in line]
+
+                # Write back only the remaining images
+                with open(output_csv_path, "w") as f:
+                    f.writelines(updated_lines)
+
+            declined_csv_path = f"{TEMP_DIR}/declined_{self.action_label}.csv"
+
+            # Append the declined image to declined CSV
+            with open(declined_csv_path, "a", newline="") as f:
+                writer = csv.writer(f)
+                writer.writerow([image_to_remove])
+
+            print(f"❌ Declined: {image_to_remove}, saved in {declined_csv_path}")
+        
+        self.load_next()  # Proceed to the next image
+
 
     def load_neighbors(self):
         """Fetch and display neighboring images in a grid layout."""
